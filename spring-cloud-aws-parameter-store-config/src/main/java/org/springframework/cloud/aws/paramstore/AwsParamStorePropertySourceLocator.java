@@ -25,11 +25,14 @@ import com.amazonaws.services.simplesystemsmanagement.AWSSimpleSystemsManagement
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.bootstrap.config.PropertySourceLocator;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.CompositePropertySource;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -43,11 +46,16 @@ import org.springframework.util.ReflectionUtils;
  * @author Joris Kuipers
  * @since 2.0.0
  */
-public class AwsParamStorePropertySourceLocator implements PropertySourceLocator {
+public class AwsParamStorePropertySourceLocator implements PropertySourceLocator, RefreshParamStore {
 
 	private AWSSimpleSystemsManagement ssmClient;
 
+	@Autowired
+	private ApplicationContext applicationContext;
+
 	private AwsParamStoreProperties properties;
+
+	CompositePropertySource cachedComposite;
 
 	private List<String> contexts = new ArrayList<>();
 
@@ -68,6 +76,8 @@ public class AwsParamStorePropertySourceLocator implements PropertySourceLocator
 		if (!(environment instanceof ConfigurableEnvironment)) {
 			return null;
 		}
+
+		this.contexts.clear();
 
 		ConfigurableEnvironment env = (ConfigurableEnvironment) environment;
 
@@ -100,18 +110,24 @@ public class AwsParamStorePropertySourceLocator implements PropertySourceLocator
 			}
 			catch (Exception e) {
 				if (this.properties.isFailFast()) {
+					if (cachedComposite != null ) {
+						return cachedComposite;
+					}
 					logger.error(
 							"Fail fast is set and there was an error reading configuration from AWS Parameter Store:\n"
 									+ e.getMessage());
 					ReflectionUtils.rethrowRuntimeException(e);
 				}
 				else {
+					if (cachedComposite != null ) {
+						return cachedComposite;
+					}
 					logger.warn("Unable to load AWS config from " + propertySourceContext,
 							e);
 				}
 			}
 		}
-
+		cachedComposite = composite;
 		return composite;
 	}
 
@@ -130,4 +146,8 @@ public class AwsParamStorePropertySourceLocator implements PropertySourceLocator
 		}
 	}
 
+	@Scheduled(cron = "${" + AwsParamStoreProperties.CONFIG_PREFIX + ".cron}")
+	public void callLocate() {
+		locate(applicationContext.getEnvironment());
+	}
 }

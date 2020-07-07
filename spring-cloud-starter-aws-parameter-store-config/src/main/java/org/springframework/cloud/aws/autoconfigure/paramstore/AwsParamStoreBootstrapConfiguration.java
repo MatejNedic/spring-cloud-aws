@@ -25,8 +25,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.aws.paramstore.AwsParamStoreProperties;
 import org.springframework.cloud.aws.paramstore.AwsParamStorePropertySourceLocator;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 /**
  * Spring Cloud Bootstrap Configuration for setting up an
@@ -36,6 +39,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 2.0.0
  */
 @Configuration(proxyBeanMethods = false)
+@EnableScheduling
 @EnableConfigurationProperties(AwsParamStoreProperties.class)
 @ConditionalOnClass({ AWSSimpleSystemsManagement.class,
 		AwsParamStorePropertySourceLocator.class })
@@ -43,6 +47,7 @@ import org.springframework.context.annotation.Configuration;
 		matchIfMissing = true)
 public class AwsParamStoreBootstrapConfiguration {
 
+	@RefreshScope
 	@Bean
 	AwsParamStorePropertySourceLocator awsParamStorePropertySourceLocator(
 			AWSSimpleSystemsManagement ssmClient, AwsParamStoreProperties properties) {
