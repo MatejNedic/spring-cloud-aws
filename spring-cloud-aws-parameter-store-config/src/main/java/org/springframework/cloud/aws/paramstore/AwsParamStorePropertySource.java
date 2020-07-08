@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.core.env.EnumerablePropertySource;
-import org.springframework.scheduling.annotation.Scheduled;
 
 /**
  * Recursively retrieves all parameters under the given context / path with decryption
@@ -38,7 +37,7 @@ import org.springframework.scheduling.annotation.Scheduled;
  * @since 2.0.0
  */
 public class AwsParamStorePropertySource
-		extends EnumerablePropertySource<AWSSimpleSystemsManagement>  implements  RefreshParamStore{
+		extends EnumerablePropertySource<AWSSimpleSystemsManagement> {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(AwsParamStorePropertySource.class);
@@ -82,12 +81,6 @@ public class AwsParamStorePropertySource
 		if (paramsResult.getNextToken() != null) {
 			getParameters(paramsRequest.withNextToken(paramsResult.getNextToken()));
 		}
-	}
-
-	@Scheduled(cron = AwsParamStoreProperties.CRON_CONFIG)
-	private void  getParameters() {
-		properties.clear();
-		init();
 	}
 
 }
