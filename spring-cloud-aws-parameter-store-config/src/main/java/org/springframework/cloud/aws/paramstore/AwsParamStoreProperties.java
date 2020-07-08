@@ -39,6 +39,8 @@ public class AwsParamStoreProperties {
 	 */
 	public static final String CONFIG_PREFIX = "aws.paramstore";
 
+	public static final String CRON_CONFIG = "${" + CONFIG_PREFIX  + ".cron}";
+
 	/**
 	 * Prefix indicating first level for every property. Value must start with a forward
 	 * slash followed by a valid path segment or be empty. Defaults to "/config".

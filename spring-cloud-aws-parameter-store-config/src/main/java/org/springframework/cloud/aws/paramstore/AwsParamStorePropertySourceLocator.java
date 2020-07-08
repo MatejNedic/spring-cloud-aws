@@ -35,6 +35,8 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.ReflectionUtils;
 
+import static org.springframework.cloud.aws.paramstore.AwsParamStoreProperties.CRON_CONFIG;
+
 /**
  * Builds a {@link CompositePropertySource} with various
  * {@link AwsParamStorePropertySource} instances based on active profiles, application
@@ -146,7 +148,7 @@ public class AwsParamStorePropertySourceLocator implements PropertySourceLocator
 		}
 	}
 
-	@Scheduled(cron = "${" + AwsParamStoreProperties.CONFIG_PREFIX + ".cron}")
+	@Scheduled(cron = CRON_CONFIG)
 	public void callLocate() {
 		locate(applicationContext.getEnvironment());
 	}
