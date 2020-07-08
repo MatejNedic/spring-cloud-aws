@@ -48,16 +48,11 @@ import static org.springframework.cloud.aws.paramstore.AwsParamStoreProperties.C
  * @author Joris Kuipers
  * @since 2.0.0
  */
-public class AwsParamStorePropertySourceLocator implements PropertySourceLocator, RefreshParamStore {
+public class AwsParamStorePropertySourceLocator implements PropertySourceLocator {
 
 	private AWSSimpleSystemsManagement ssmClient;
 
-	@Autowired
-	private ApplicationContext applicationContext;
-
 	private AwsParamStoreProperties properties;
-
-	CompositePropertySource cachedComposite;
 
 	private List<String> contexts = new ArrayList<>();
 
@@ -78,8 +73,6 @@ public class AwsParamStorePropertySourceLocator implements PropertySourceLocator
 		if (!(environment instanceof ConfigurableEnvironment)) {
 			return null;
 		}
-
-		this.contexts.clear();
 
 		ConfigurableEnvironment env = (ConfigurableEnvironment) environment;
 
@@ -112,24 +105,18 @@ public class AwsParamStorePropertySourceLocator implements PropertySourceLocator
 			}
 			catch (Exception e) {
 				if (this.properties.isFailFast()) {
-					if (cachedComposite != null ) {
-						return cachedComposite;
-					}
 					logger.error(
 							"Fail fast is set and there was an error reading configuration from AWS Parameter Store:\n"
 									+ e.getMessage());
 					ReflectionUtils.rethrowRuntimeException(e);
 				}
 				else {
-					if (cachedComposite != null ) {
-						return cachedComposite;
-					}
 					logger.warn("Unable to load AWS config from " + propertySourceContext,
 							e);
 				}
 			}
 		}
-		cachedComposite = composite;
+
 		return composite;
 	}
 
@@ -148,8 +135,4 @@ public class AwsParamStorePropertySourceLocator implements PropertySourceLocator
 		}
 	}
 
-	@Scheduled(cron = CRON_CONFIG)
-	public void callLocate() {
-		locate(applicationContext.getEnvironment());
-	}
 }

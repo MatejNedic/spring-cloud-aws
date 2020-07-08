@@ -39,6 +39,10 @@ public class AwsParamStoreProperties {
 	 */
 	public static final String CONFIG_PREFIX = "aws.paramstore";
 
+	/**
+	 * if  cron_config.cron = cron expression value is set it will poll data from aws.
+	 * If it is not set it will work like before.
+	 */
 	public static final String CRON_CONFIG = "${" + CONFIG_PREFIX  + ".cron}";
 
 	/**
