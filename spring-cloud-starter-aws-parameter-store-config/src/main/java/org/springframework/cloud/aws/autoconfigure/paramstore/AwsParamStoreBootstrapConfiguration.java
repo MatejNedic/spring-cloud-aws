@@ -47,7 +47,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 		matchIfMissing = true)
 public class AwsParamStoreBootstrapConfiguration {
 
-	@RefreshScope
 	@Bean
 	AwsParamStorePropertySourceLocator awsParamStorePropertySourceLocator(
 			AWSSimpleSystemsManagement ssmClient, AwsParamStoreProperties properties) {
