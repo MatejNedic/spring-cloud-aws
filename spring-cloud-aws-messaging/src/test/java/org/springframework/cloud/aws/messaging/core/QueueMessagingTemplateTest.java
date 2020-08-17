@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.aws.messaging.core;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Locale;
 
@@ -82,6 +81,23 @@ class QueueMessagingTemplateTest {
 		verify(amazonSqs).sendMessage(sendMessageRequestArgumentCaptor.capture());
 		assertThat(sendMessageRequestArgumentCaptor.getValue().getQueueUrl())
 				.isEqualTo("https://queue-url.com");
+	}
+
+	@Test
+	void send_withDefaultDestination_usesDefaultDestination_car() {
+		AmazonSQSAsync amazonSqs = createAmazonSqs();
+		QueueMessagingTemplate queueMessagingTemplate = new QueueMessagingTemplate(
+			amazonSqs);
+		queueMessagingTemplate.setDefaultDestinationName("my-queue");
+
+		Message<MessageBodyTest> stringMessage = MessageBuilder.withPayload(new MessageBodyTest()).build();
+		queueMessagingTemplate.send(stringMessage);
+
+		ArgumentCaptor<SendMessageRequest> sendMessageRequestArgumentCaptor = ArgumentCaptor
+			.forClass(SendMessageRequest.class);
+		verify(amazonSqs).sendMessage(sendMessageRequestArgumentCaptor.capture());
+		assertThat(sendMessageRequestArgumentCaptor.getValue().getQueueUrl())
+			.isEqualTo("https://queue-url.com");
 	}
 
 	@Test
@@ -189,10 +205,9 @@ class QueueMessagingTemplateTest {
 		QueueMessagingTemplate queueMessagingTemplate = new QueueMessagingTemplate(
 				amazonSqs);
 
-		Car message = queueMessagingTemplate.receiveAndConvert("my-queue",
-				Car.class);
+		MessageBodyTest message = queueMessagingTemplate.receiveAndConvert("my-queue", MessageBodyTest.class);
 
-		assertThat(message).isEqualTo(new Car());
+		assertThat(message).isEqualTo(new MessageBodyTest());
 	}
 
 	@Test
@@ -249,7 +264,7 @@ class QueueMessagingTemplateTest {
 	private AmazonSQSAsync testSqs() throws JsonProcessingException {
 		AmazonSQSAsync amazonSqs = mock(AmazonSQSAsync.class);
 		ObjectMapper obj = new ObjectMapper();
-		Car car = new Car();
+		MessageBodyTest messageBodyTest = new MessageBodyTest();
 		obj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 		GetQueueUrlResult queueUrl = new GetQueueUrlResult();
 		queueUrl.setQueueUrl("https://queue-url.com");
@@ -257,7 +272,7 @@ class QueueMessagingTemplateTest {
 
 		ReceiveMessageResult receiveMessageResult = new ReceiveMessageResult();
 		com.amazonaws.services.sqs.model.Message message = new com.amazonaws.services.sqs.model.Message();
-		message.setBody(obj.writeValueAsString(car));
+		message.setBody(obj.writeValueAsString(messageBodyTest));
 		receiveMessageResult.withMessages(message);
 		when(amazonSqs.receiveMessage(any(ReceiveMessageRequest.class)))
 			.thenReturn(receiveMessageResult);

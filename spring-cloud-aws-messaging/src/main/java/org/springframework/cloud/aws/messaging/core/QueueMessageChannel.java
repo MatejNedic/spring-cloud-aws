@@ -32,11 +32,12 @@ import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.amazonaws.services.sqs.model.SendMessageResult;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.MessageHeaders;
@@ -51,6 +52,7 @@ import static org.springframework.cloud.aws.messaging.core.QueueMessageUtils.cre
 /**
  * @author Agim Emruli
  * @author Alain Sahli
+ * @author Matej Nedic
  * @since 1.0
  */
 public class QueueMessageChannel extends AbstractMessageChannel
@@ -62,7 +64,7 @@ public class QueueMessageChannel extends AbstractMessageChannel
 
 	private final AmazonSQSAsync amazonSqs;
 
-	private static ObjectMapper objectMapper = new ObjectMapper();
+	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	private final String queueUrl;
 
@@ -105,8 +107,9 @@ public class QueueMessageChannel extends AbstractMessageChannel
 			sendMessageRequest = new SendMessageRequest(this.queueUrl,
 														(message.getPayload() instanceof String) ?  String.valueOf(message.getPayload()) :
 															objectMapper.writeValueAsString(message.getPayload()));
-		} catch (JsonProcessingException jsonProcessingException) {
-			jsonProcessingException.printStackTrace();
+		}
+		catch (JsonProcessingException jsonProcessingException) {
+			// log error
 		}
 
 		if (message.getHeaders().containsKey(SqsMessageHeaders.SQS_GROUP_ID_HEADER)) {

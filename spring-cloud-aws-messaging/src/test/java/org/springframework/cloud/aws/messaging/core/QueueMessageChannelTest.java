@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.aws.messaging.core;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -678,15 +677,11 @@ class QueueMessageChannelTest {
 
 		// Act
 		boolean result = queueMessageChannel
-				.send(MessageBuilder.withPayload(new Car()).build(), 1000);
+				.send(MessageBuilder.withPayload(new MessageBodyTest()).build(), 1000);
 
 		// Assert
 		assertThat(result).isTrue();
 		verify(amazonSqs, only()).sendMessageAsync(any(SendMessageRequest.class));
-	}
-	private class Car {
-		private String name = "Opel";
-		private int price = 10000;
 	}
 
 	@Test
