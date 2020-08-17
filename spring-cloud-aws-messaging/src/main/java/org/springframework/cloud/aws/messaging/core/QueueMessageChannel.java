@@ -36,8 +36,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageDeliveryException;
@@ -58,9 +56,6 @@ import static org.springframework.cloud.aws.messaging.core.QueueMessageUtils.cre
  */
 public class QueueMessageChannel extends AbstractMessageChannel
 		implements PollableChannel {
-
-	private static final Logger LOGGER = LoggerFactory
-		.getLogger(QueueMessageChannel.class);
 
 	static final String ATTRIBUTE_NAMES = "All";
 
@@ -102,7 +97,7 @@ public class QueueMessageChannel extends AbstractMessageChannel
 			return false;
 		}
 		catch (JsonProcessingException e) {
-			LOGGER.error(e.getMessage());
+			logger.error(e.getMessage());
 			return false;
 		}
 
