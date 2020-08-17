@@ -38,6 +38,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.MessageHeaders;
@@ -100,20 +101,18 @@ public class QueueMessageChannel extends AbstractMessageChannel
 		catch (TimeoutException e) {
 			return false;
 		}
+		catch (JsonProcessingException e) {
+			logger.error(e.getMessage());
+			return false;
+		}
 
 		return true;
 	}
 
-	private SendMessageRequest prepareSendMessageRequest(Message<?> message) {
-		SendMessageRequest sendMessageRequest = null;
-		try {
-			sendMessageRequest = new SendMessageRequest(this.queueUrl,
-														(message.getPayload() instanceof String) ?  String.valueOf(message.getPayload()) :
-															objectMapper.writeValueAsString(message.getPayload()));
-		}
-		catch (JsonProcessingException jsonProcessingException) {
-			LOGGER.error(jsonProcessingException.getMessage());
-		}
+	private SendMessageRequest prepareSendMessageRequest(Message<?> message) throws JsonProcessingException {
+		SendMessageRequest sendMessageRequest = new SendMessageRequest(this.queueUrl,
+										(message.getPayload() instanceof String) ?
+											String.valueOf(message.getPayload()) : objectMapper.writeValueAsString(message.getPayload()));
 
 		if (message.getHeaders().containsKey(SqsMessageHeaders.SQS_GROUP_ID_HEADER)) {
 			sendMessageRequest.setMessageGroupId(message.getHeaders()
