@@ -84,7 +84,7 @@ class QueueMessagingTemplateTest {
 	}
 
 	@Test
-	void send_withDefaultDestination_usesDefaultDestination_car() {
+	void send_withDefaultDestination_usesDefaultDestination_Pojo_body() {
 		AmazonSQSAsync amazonSqs = createAmazonSqs();
 		QueueMessagingTemplate queueMessagingTemplate = new QueueMessagingTemplate(
 			amazonSqs);
@@ -99,6 +99,7 @@ class QueueMessagingTemplateTest {
 		assertThat(sendMessageRequestArgumentCaptor.getValue().getQueueUrl())
 			.isEqualTo("https://queue-url.com");
 	}
+
 
 	@Test
 	void send_withDestination_usesDestination() {
@@ -200,7 +201,7 @@ class QueueMessagingTemplateTest {
 	}
 
 	@Test
-	void receiveAndConvert_withDestination_usesDestinationAndConvertsMessage() throws JsonProcessingException {
+	void receiveAndConvert_withDestination_usesDestinationAndConvertsMessage_Pojo() throws JsonProcessingException {
 		AmazonSQSAsync amazonSqs = testSqs();
 		QueueMessagingTemplate queueMessagingTemplate = new QueueMessagingTemplate(
 				amazonSqs);
@@ -208,6 +209,17 @@ class QueueMessagingTemplateTest {
 		MessageBodyTest message = queueMessagingTemplate.receiveAndConvert("my-queue", MessageBodyTest.class);
 
 		assertThat(message).isEqualTo(new MessageBodyTest());
+	}
+
+	@Test
+	void receiveAndConvert_withDestination_usesDestinationAndConvertsMessage_String() throws JsonProcessingException {
+		AmazonSQSAsync amazonSqs = createAmazonSqs();
+		QueueMessagingTemplate queueMessagingTemplate = new QueueMessagingTemplate(
+			amazonSqs);
+
+		String message = queueMessagingTemplate.receiveAndConvert("my-queue", String.class);
+
+		assertThat(message).isEqualTo("My message");
 	}
 
 	@Test

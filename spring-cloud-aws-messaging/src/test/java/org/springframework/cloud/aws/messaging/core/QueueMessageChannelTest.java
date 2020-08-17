@@ -664,7 +664,7 @@ class QueueMessageChannelTest {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	void sendMessage_withTimeout_sendsMessageAsyncAndReturnsTrueOnceFutureCompleted()
+	void sendMessage_withTimeout_sendsMessageAsyncAndReturnsTrueOnceFutureCompleted_String()
 			throws Exception {
 		// Arrange
 		Future<SendMessageResult> future = mock(Future.class);
@@ -677,7 +677,29 @@ class QueueMessageChannelTest {
 
 		// Act
 		boolean result = queueMessageChannel
-				.send(MessageBuilder.withPayload(new MessageBodyTest()).build(), 1000);
+				.send(MessageBuilder.withPayload("Hello").build(), 1000);
+
+		// Assert
+		assertThat(result).isTrue();
+		verify(amazonSqs, only()).sendMessageAsync(any(SendMessageRequest.class));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	void sendMessage_withTimeout_sendsMessageAsyncAndReturnsTrueOnceFutureCompleted_Pojo()
+		throws Exception {
+		// Arrange
+		Future<SendMessageResult> future = mock(Future.class);
+		when(future.get(1000, TimeUnit.MILLISECONDS)).thenReturn(new SendMessageResult());
+		AmazonSQSAsync amazonSqs = mock(AmazonSQSAsync.class);
+		when(amazonSqs.sendMessageAsync(any(SendMessageRequest.class)))
+			.thenReturn(future);
+		QueueMessageChannel queueMessageChannel = new QueueMessageChannel(amazonSqs,
+																		  "http://testQueue");
+
+		// Act
+		boolean result = queueMessageChannel
+			.send(MessageBuilder.withPayload(new MessageBodyTest()).build(), 1000);
 
 		// Assert
 		assertThat(result).isTrue();
