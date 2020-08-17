@@ -102,7 +102,7 @@ public class QueueMessageChannel extends AbstractMessageChannel
 			return false;
 		}
 		catch (JsonProcessingException e) {
-			logger.error(e.getMessage());
+			LOGGER.error(e.getMessage());
 			return false;
 		}
 

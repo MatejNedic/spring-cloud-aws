@@ -138,6 +138,24 @@ class QueueMessagingTemplateTest {
 	}
 
 	@Test
+	void send_withCustomDestinationResolveAndDestination_usesDestination_Pojo() {
+		AmazonSQSAsync amazonSqs = createAmazonSqs();
+		QueueMessagingTemplate queueMessagingTemplate = new QueueMessagingTemplate(
+			amazonSqs,
+			(DestinationResolver<String>) name -> name.toUpperCase(Locale.ENGLISH),
+			null);
+
+		Message<MessageBodyTest> stringMessage = MessageBuilder.withPayload(new MessageBodyTest()).build();
+		queueMessagingTemplate.send("myqueue", stringMessage);
+
+		ArgumentCaptor<SendMessageRequest> sendMessageRequestArgumentCaptor = ArgumentCaptor
+			.forClass(SendMessageRequest.class);
+		verify(amazonSqs).sendMessage(sendMessageRequestArgumentCaptor.capture());
+		assertThat(sendMessageRequestArgumentCaptor.getValue().getQueueUrl())
+			.isEqualTo("MYQUEUE");
+	}
+
+	@Test
 	void receive_withoutDefaultDestination_throwsAnException() {
 		AmazonSQSAsync amazonSqs = createAmazonSqs();
 		QueueMessagingTemplate queueMessagingTemplate = new QueueMessagingTemplate(
