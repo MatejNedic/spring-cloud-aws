@@ -25,6 +25,8 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.mock.env.MockEnvironment;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -35,10 +37,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Dawid Kublik
  * @author Eddú Meléndez
+ * @author Matej Nedic
  */
 class CloudWatchExportAutoConfigurationTest {
-
-	private MockEnvironment env;
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
 			.withConfiguration(
@@ -46,9 +47,10 @@ class CloudWatchExportAutoConfigurationTest {
 
 	@Test
 	void testWithoutSettingAnyConfigProperties() {
-		this.contextRunner.run(context -> assertThat(
-				context.getBeansOfType(CloudWatchMeterRegistry.class).isEmpty())
-						.isTrue());
+		this.contextRunner.run(context -> {
+			assertThat(context.getBeansOfType(CloudWatchMeterRegistry.class).isEmpty())
+				.isTrue();
+		});
 	}
 
 	@Test
@@ -112,6 +114,21 @@ class CloudWatchExportAutoConfigurationTest {
 					Object region = ReflectionTestUtils.getField(client, "signingRegion");
 					assertThat(region).isEqualTo(Regions.US_EAST_1.getName());
 				});
+	void testConfiguration() {
+		this.contextRunner
+				.withPropertyValues("management.metrics.export.cloudwatch.namespace:test")
+				.run(context -> {
+					CloudWatchConfig cloudWatchConfig = context
+							.getBean(CloudWatchConfig.class);
+					CloudWatchProperties cloudWatchProperties = context
+							.getBean(CloudWatchProperties.class);
+					assertThat(context.getBean(CloudWatchMeterRegistry.class))
+							.isNotNull();
+					assertThat(context.getBean(Clock.class)).isNotNull();
+					assertThat(cloudWatchConfig).isNotNull();
+					assertThat(cloudWatchProperties).isNotNull();
+					assertThat(cloudWatchProperties.getNamespace())
+							.isEqualTo(cloudWatchConfig.namespace());
+				});
 	}
-
 }
