@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.aws.autoconfigure.mail;
+package org.springframework.cloud.aws.autoconfigure.odlmail;
 
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClient;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
-
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.cloud.aws.autoconfigure.oldmail.SimpleEmailAutoConfiguration;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClient;
 
 class SimpleEmailAutoConfigurationTest {
 
@@ -36,7 +37,7 @@ class SimpleEmailAutoConfigurationTest {
 
 	@Test
 	void mailSender_MailSenderWithJava_configuresJavaMailSender() {
-		this.contextRunner.withPropertyValues("spring.cloud.aws.mail.enabled:true").run(context -> {
+		this.contextRunner.withPropertyValues("cloud.aws.mail.enabled:true").run(context -> {
 			assertThat(context.getBean(MailSender.class)).isNotNull();
 			assertThat(context.getBean(JavaMailSender.class)).isNotNull();
 			assertThat(context.getBean(JavaMailSender.class))
@@ -52,7 +53,7 @@ class SimpleEmailAutoConfigurationTest {
 
 	@Test
 	void enableAutoConfigurationWithSpecificRegion() {
-		this.contextRunner.withPropertyValues("spring.cloud.aws.mail.region:us-east-1")
+		this.contextRunner.withPropertyValues("cloud.aws.mail.region:us-east-1")
 				.run(context -> {
 					assertThat(context.getBean(MailSender.class)).isNotNull();
 					assertThat(context.getBean(JavaMailSender.class)).isNotNull();
@@ -80,7 +81,7 @@ class SimpleEmailAutoConfigurationTest {
 
 	@Test
 	void mailIsDisabled() {
-		this.contextRunner.withPropertyValues("spring.cloud.aws.mail.enabled:false")
+		this.contextRunner.withPropertyValues("cloud.aws.mail.enabled:false", "spring.cloud.aws.mail.enabled:false")
 				.run(context -> {
 					assertThat(context).doesNotHaveBean(MailSender.class);
 					assertThat(context).doesNotHaveBean(JavaMailSender.class);

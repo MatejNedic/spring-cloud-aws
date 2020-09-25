@@ -53,7 +53,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 @ConditionalOnMissingBean(MailSender.class)
 @Import(ContextCredentialsAutoConfiguration.class)
 @EnableConfigurationProperties(SimpleEmailProperties.class)
-@ConditionalOnProperty(name = "cloud.aws.mail.enabled", havingValue = "true",
+@ConditionalOnProperty(name = "cloud.aws.mail.enabled",
 		matchIfMissing = true)
 public class SimpleEmailAutoConfiguration {
 
