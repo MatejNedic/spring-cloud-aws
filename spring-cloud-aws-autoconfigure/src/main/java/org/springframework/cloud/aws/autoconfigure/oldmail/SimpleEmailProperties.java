@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.aws.autoconfigure.mail;
+package org.springframework.cloud.aws.autoconfigure.oldmail;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 
 /**
  * Configuration properties for AWS Simple Email Service.
  *
  * @author Eddú Meléndez
  */
-@ConfigurationProperties(prefix = "spring.cloud.aws.mail")
+@ConfigurationProperties(prefix = "cloud.aws.mail")
 public class SimpleEmailProperties {
 
 	/**
@@ -31,6 +32,7 @@ public class SimpleEmailProperties {
 	 */
 	private String region;
 
+	@DeprecatedConfigurationProperty(replacement = "spring.cloud.aws.mail.region")
 	public String getRegion() {
 		return region;
 	}

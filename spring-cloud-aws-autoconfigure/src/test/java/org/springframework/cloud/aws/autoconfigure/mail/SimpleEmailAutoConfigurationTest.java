@@ -36,7 +36,7 @@ class SimpleEmailAutoConfigurationTest {
 
 	@Test
 	void mailSender_MailSenderWithJava_configuresJavaMailSender() {
-		this.contextRunner.run(context -> {
+		this.contextRunner.withPropertyValues("spring.cloud.aws.mail.enabled:enabled").run(context -> {
 			assertThat(context.getBean(MailSender.class)).isNotNull();
 			assertThat(context.getBean(JavaMailSender.class)).isNotNull();
 			assertThat(context.getBean(JavaMailSender.class))
@@ -52,7 +52,7 @@ class SimpleEmailAutoConfigurationTest {
 
 	@Test
 	void enableAutoConfigurationWithSpecificRegion() {
-		this.contextRunner.withPropertyValues("cloud.aws.mail.region:us-east-1")
+		this.contextRunner.withPropertyValues("spring.cloud.aws.mail.region:us-east-1")
 				.run(context -> {
 					assertThat(context.getBean(MailSender.class)).isNotNull();
 					assertThat(context.getBean(JavaMailSender.class)).isNotNull();
@@ -80,7 +80,7 @@ class SimpleEmailAutoConfigurationTest {
 
 	@Test
 	void mailIsDisabled() {
-		this.contextRunner.withPropertyValues("cloud.aws.mail.enabled:false")
+		this.contextRunner.withPropertyValues("spring.cloud.aws.mail.enabled:false")
 				.run(context -> {
 					assertThat(context).doesNotHaveBean(MailSender.class);
 					assertThat(context).doesNotHaveBean(JavaMailSender.class);

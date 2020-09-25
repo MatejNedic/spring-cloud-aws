@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.aws.autoconfigure.mail;
+package org.springframework.cloud.aws.autoconfigure.oldmail;
 
 import javax.mail.Session;
 
@@ -50,11 +50,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 @Configuration(proxyBeanMethods = false)
 @AutoConfigureAfter(MailSenderAutoConfiguration.class)
 @ConditionalOnClass({ AmazonSimpleEmailService.class, MailSender.class })
-@ConditionalOnMissingClass("org.springframework.cloud.aws.autoconfigure.oldmail.SimpleEmailAutoConfiguration")
 @ConditionalOnMissingBean(MailSender.class)
 @Import(ContextCredentialsAutoConfiguration.class)
 @EnableConfigurationProperties(SimpleEmailProperties.class)
-@ConditionalOnProperty(name = "spring.cloud.aws.mail.enabled", havingValue = "true",
+@ConditionalOnProperty(name = "cloud.aws.mail.enabled", havingValue = "true",
 		matchIfMissing = true)
 public class SimpleEmailAutoConfiguration {
 
